@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+    labels:
+        app: backend
+    name: backend
+spec:
+    ports:
+        - name: "3001"
+          port: {{ .Values.backendPort }}
+          targetPort: {{ .Values.backendPort }}
+    selector:
+        app: backend

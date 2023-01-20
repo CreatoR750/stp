@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    labels:
+        app: frontend
+    name: frontend
+spec:
+    replicas: {{ .Values.replicaCount }}
+    selector:
+        matchLabels:
+            app: frontend
+    template:
+        metadata:
+            labels:
+                app: frontend
+        spec:
+            containers:
+                - env:
+                      - name: SERVER_ORIGIN
+                        value: http://localhost:3001
+                  image: frontend
+                  readinessProbe:
+                      tcpSocket:
+                          port:  {{ .Values.frontendPort }}
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                  livenessProbe:
+                      tcpSocket:
+                          port: {{ .Values.frontendPort }}
+                      initialDelaySeconds: 5
+                      periodSeconds: 20
+                  imagePullPolicy: Never
+                  name: frontend
+                  ports:
+                      - containerPort: {{ .Values.frontendPort }}
+                  resources:
+                      limits:
+                          memory: 512Mi
+                          cpu: "1"
+                      requests:
+                          memory: 256Mi
+                          cpu: "0.2"
+            restartPolicy: Always

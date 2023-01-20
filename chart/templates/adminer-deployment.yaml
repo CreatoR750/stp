@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    labels:
+        app: adminer
+    name: adminer
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: adminer
+    template:
+        metadata:
+            labels:
+                app: adminer
+        spec:
+            containers:
+                - image: adminer
+                  readinessProbe:
+                      tcpSocket:
+                          port: {{ .Values.adminerPort }}
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                  livenessProbe:
+                      tcpSocket:
+                          port: {{ .Values.adminerPort }}
+                      initialDelaySeconds: 5
+                      periodSeconds: 20
+                  name: adminer
+                  ports:
+                      - containerPort: {{ .Values.adminerPort }}
+                  resources:
+                    limits:
+                        memory: 512Mi
+                        cpu: "1"
+                    requests:
+                        memory: 256Mi
+                        cpu: "0.2"
+            restartPolicy: Always

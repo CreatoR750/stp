@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    labels:
+        app: backend
+    name: backend
+spec:
+    replicas: {{ .Values.replicaCount }}
+    selector:
+        matchLabels:
+            app: backend
+    template:
+        metadata:
+            labels:
+                app: backend
+        spec:
+            containers:
+                - env:
+                      - name: CORS_ORIGIN_REGEX
+                        value: http([s])?:\/\/localhost
+                      - name: JWT_SECRET_TOKEN
+                        value: 213sadadas31231
+                      - name: MYSQL_HOST
+                        value: db
+                  image: backend
+                  livenessProbe:
+                      httpGet:
+                          path: /
+                          port: {{ .Values.backendPort }}
+                      initialDelaySeconds: 20
+                      periodSeconds: 20
+                  readinessProbe:
+                      httpGet:
+                          path: /
+                          port: {{ .Values.backendPort }}
+                      initialDelaySeconds: 3
+                      periodSeconds: 10
+                  imagePullPolicy: Never
+                  name: backend
+                  ports:
+                      - containerPort: {{ .Values.backendPort }}
+                  resources:
+                      limits:
+                          memory: 512Mi
+                          cpu: "1"
+                      requests:
+                          memory: 256Mi
+                          cpu: "0.2"
+            restartPolicy: Always
